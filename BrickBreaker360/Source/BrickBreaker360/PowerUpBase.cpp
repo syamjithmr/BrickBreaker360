@@ -43,7 +43,7 @@ void APowerUpBase::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 	if (OtherActor->GetFName().GetPlainNameString().Contains("base"))
 	{
 		ActivatePowerUp();
-		SetActorHiddenInGame(false);
+		SetActorHiddenInGame(true);
 	}
 }
 
