@@ -14,6 +14,8 @@ class ABrickBreaker360GameMode : public AGameModeBase
 
 public:
 	ABrickBreaker360GameMode();
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		TArray<class APowerUpBase*> ActivatedPowerUps;
 };
 
 

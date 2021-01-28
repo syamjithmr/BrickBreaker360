@@ -3,6 +3,7 @@
 #include "BrickBreaker360GameMode.h"
 #include "BrickBreaker360PlayerController.h"
 #include "BrickBreaker360Base.h"
+#include "PowerUpBase.h"
 
 ABrickBreaker360GameMode::ABrickBreaker360GameMode()
 {

@@ -20,9 +20,9 @@ ABrickBreaker360Block::ABrickBreaker360Block()
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> OrangeMaterial;
 		FConstructorStatics()
 			: PlaneMesh(TEXT("/Game/Puzzle/Meshes/PuzzleCube.PuzzleCube"))
-			, BaseMaterial(TEXT("/Game/Puzzle/Meshes/BaseMaterial.BaseMaterial"))
-			, BlueMaterial(TEXT("/Game/Puzzle/Meshes/BlueMaterial.BlueMaterial"))
-			, OrangeMaterial(TEXT("/Game/Puzzle/Meshes/OrangeMaterial.OrangeMaterial"))
+			, BaseMaterial(TEXT("Material'/Game/Materials/BaseMaterial.BaseMaterial'"))
+			, BlueMaterial(TEXT("MaterialInstanceConstant'/Game/Materials/BlueMaterial.BlueMaterial'"))
+			, OrangeMaterial(TEXT("MaterialInstanceConstant'/Game/Materials/OrangeMaterial.OrangeMaterial'"))
 		{
 		}
 	};
@@ -67,4 +67,10 @@ void ABrickBreaker360Block::SetPowerUpScale()
 {
 	if(PowerUp)
 		PowerUp->ScaleX(GetActorScale3D().X);
+}
+
+void ABrickBreaker360Block::SetPowerUpScale(float ScaleXY)
+{
+	if (PowerUp)
+		PowerUp->ScaleXY(ScaleXY);
 }

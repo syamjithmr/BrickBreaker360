@@ -27,6 +27,10 @@ public:
 	UPROPERTY()
 		class UMaterialInstance* BaseNotHitMaterial;
 
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class UBrickBreaker360HUD_UI_Base> HUD_UI_Class;
+	UBrickBreaker360HUD_UI_Base* HUD_UI;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

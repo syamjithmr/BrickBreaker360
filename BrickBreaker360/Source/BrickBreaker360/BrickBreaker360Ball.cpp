@@ -15,11 +15,7 @@ ABrickBreaker360Ball::ABrickBreaker360Ball()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	// Create dummy root scene component
-	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-
 	SphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collider Component"));
-	//SphereCollider->SetupAttachment(RootComponent);
 	RootComponent = SphereCollider;
 	SphereCollider->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 
@@ -30,8 +26,6 @@ ABrickBreaker360Ball::ABrickBreaker360Ball()
 	BallMesh->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 	BallMesh->SetRelativeScale3D(FVector(0.6f, 0.6f, 0.6f));
 
-	ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMatAsset(TEXT("PhysicalMaterial'/Game/BallPhyscalMat.BallPhyscalMat'"));
-	BallPhysMat = PhysMatAsset.Object;
 	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	IsSticky = true;
@@ -120,10 +114,10 @@ void ABrickBreaker360Ball::OnHit(AActor* SelfActor, AActor* OtherActor, FVector 
 	{
 		if (APowerUpBase* powerUp = Cast<ABrickBreaker360Block>(OtherActor)->PowerUp)
 		{
-			FVector PowerUpVelocity = Hit.ImpactPoint - GetActorLocation();// *SphereCollider->GetPhysicsLinearVelocity();
-			PowerUpVelocity.Normalize();
-			PowerUpVelocity *= SphereCollider->GetPhysicsLinearVelocity()/2;
-			powerUp->StartPowerUp(PowerUpVelocity);
+			FVector PowerUpVelocity = SphereCollider->GetPhysicsLinearVelocity();//Hit.ImpactPoint - GetActorLocation();// ;
+			/*PowerUpVelocity.Normalize();
+			PowerUpVelocity *= SphereCollider->GetPhysicsLinearVelocity()/2;*/
+			powerUp->StartPowerUp(PowerUpVelocity.GetSafeNormal());
 		}
 		OtherActor->Destroy();
 	}

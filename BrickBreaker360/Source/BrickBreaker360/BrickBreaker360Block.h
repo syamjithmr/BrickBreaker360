@@ -50,6 +50,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	APowerUpBase* PowerUp;
 	void SetPowerUpScale();
+	void SetPowerUpScale(float ScaleXY);
 
 public:
 	/** Returns DummyRoot subobject **/

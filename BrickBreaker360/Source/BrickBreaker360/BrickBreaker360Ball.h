@@ -40,8 +40,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 		class USphereComponent* SphereCollider;
-
-	class UPhysicalMaterial* BallPhysMat;
+	
+	UPROPERTY(EditAnywhere)
+		UPhysicalMaterial* BallPhysMat;
 
 public:	
 	// Called every frame

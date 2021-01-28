@@ -2,10 +2,11 @@
 
 
 #include "BrickBreaker360Base.h"
+#include "BrickBreaker360Ball.h"
+#include "BrickBreaker360HUD_UI_Base.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Materials/MaterialInstance.h"
-#include "BrickBreaker360Ball.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -21,7 +22,7 @@ ABrickBreaker360Base::ABrickBreaker360Base()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> BasePlainMesh(TEXT("/Game/Puzzle/Meshes/PuzzleCube.PuzzleCube"));
-	ConstructorHelpers::FObjectFinder<UMaterialInstance> BaseNotHitMat(TEXT("/Game/Puzzle/Meshes/BaseMaterialNotHit.BaseMaterialNotHit"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> BaseNotHitMat(TEXT("MaterialInstanceConstant'/Game/Materials/BaseMaterialNotHit.BaseMaterialNotHit'"));
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh0"));
 	BaseMesh->SetStaticMesh(BasePlainMesh.Object);
 	BaseMesh->SetMaterial(0, BaseNotHitMat.Object);
@@ -55,6 +56,12 @@ void ABrickBreaker360Base::BeginPlay()
 		BallObject = GetWorld()->SpawnActor<ABrickBreaker360Ball>(BallObjectClass);
 	BallObject->GetActorBounds(false, temp, BallExtent);
 	AttachBallToBase();
+
+	if (HUD_UI_Class)
+	{
+		HUD_UI = Cast<UBrickBreaker360HUD_UI_Base>(CreateWidget(GetWorld(), HUD_UI_Class));
+		HUD_UI->AddToViewport();
+	}
 }
 
 void ABrickBreaker360Base::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
