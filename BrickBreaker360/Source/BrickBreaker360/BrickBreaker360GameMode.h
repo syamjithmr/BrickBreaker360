@@ -14,6 +14,10 @@ class ABrickBreaker360GameMode : public AGameModeBase
 
 public:
 	ABrickBreaker360GameMode();
+
+	//Stores currently activated PowerUps
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+		TArray<class APowerUpBase*> ActivatedPowerUps;
 };
 
 

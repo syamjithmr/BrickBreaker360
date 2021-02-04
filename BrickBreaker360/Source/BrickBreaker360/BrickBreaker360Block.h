@@ -26,30 +26,26 @@ class ABrickBreaker360Block : public AActor
 public:
 	ABrickBreaker360Block();
 
-	/** Are we currently active? */
-	bool bIsActive;
-
-	/** Pointer to white material used on the focused block */
-	UPROPERTY()
-	class UMaterial* BaseMaterial;
-
 	/** Pointer to blue material used on inactive blocks */
 	UPROPERTY()
 	class UMaterialInstance* BlueMaterial;
 
-	/** Pointer to orange material used on active blocks */
+	/** Pointer to orange material used on active blocks(Blocks with a power Up) */
 	UPROPERTY()
 	class UMaterialInstance* OrangeMaterial;
 
-	/** Grid that owns us */
-	UPROPERTY()
-	class ABrickBreaker360BlockGrid* OwningGrid;
-
+	// Array containing all Spawnable Power Ups.
 	UPROPERTY(EditAnywhere)
 		TArray<TSubclassOf<class APowerUpBase>> PowerUpArray;
+	// Power Up attached to this Block. Null if no Power Up is attached.
 	UPROPERTY(VisibleAnywhere)
-	APowerUpBase* PowerUp;
+		APowerUpBase* PowerUp;
+	// Probability of a Power Up to spawn.
+	UPROPERTY(EditAnywhere)
+		int PowerUpSpawnProbability;
+	// Set the scale of Power Up.
 	void SetPowerUpScale();
+	void SetPowerUpScale(float ScaleXY);
 
 public:
 	/** Returns DummyRoot subobject **/

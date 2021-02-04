@@ -14,40 +14,45 @@ class BRICKBREAKER360_API ABrickBreaker360Base : public APawn
 	/** StaticMesh component for the base */
 	UPROPERTY(Category = Block, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* BaseMesh;
-
 	UPROPERTY(EditAnywhere)
-	class UBoxComponent* BoxCollider;
+		class UBoxComponent* BoxCollider;
+
 public:	
 	// Sets default values for this actor's properties
 	ABrickBreaker360Base();
 
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
-	/** Pointer to white material used on the focused block */
 	UPROPERTY()
 		class UMaterialInstance* BaseNotHitMaterial;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class UBrickBreaker360HUD_UI_Base> HUD_UI_Class;
+	UBrickBreaker360HUD_UI_Base* HUD_UI;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	//virtual UPawnMovementComponent* GetMovementComponent() const override;
 
+	// Moves the Base according to movement input.
 	void MoveBase(float moveRate);
+	// Shoot the ball in Base's forward direction.
 	void ShootBall();
+	// Attach the ball to Base.
 	void AttachBallToBase();
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ABrickBreaker360Ball> BallObjectClass;
 	ABrickBreaker360Ball* BallObject;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+public:
+	// Decides mmovement direction and sensitivity.
 	int MovementSensitivity;
-	int MovementDirection;//1 for Clockwise, -1 for anticlockwise
+	int MovementDirection;//1 for Clockwise, -1 for anticlockwise.
+	// Position to attach the Ball.
 	float BallAttachPos;
+	// Bounds of Base and Ball object.
 	FVector BaseExtent, BallExtent;
+	// Current rotation of the Base. Used to rotate the main menu objects.
 	UPROPERTY(BlueprintReadOnly)
 		FRotator Rotation;
 

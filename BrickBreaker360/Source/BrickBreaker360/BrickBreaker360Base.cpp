@@ -2,10 +2,12 @@
 
 
 #include "BrickBreaker360Base.h"
+#include "BrickBreaker360Ball.h"
+#include "BrickBreaker360BlockGrid.h"
+#include "BrickBreaker360HUD_UI_Base.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Materials/MaterialInstance.h"
-#include "BrickBreaker360Ball.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -13,15 +15,12 @@
 // Sets default values
 ABrickBreaker360Base::ABrickBreaker360Base()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> BasePlainMesh(TEXT("/Game/Puzzle/Meshes/PuzzleCube.PuzzleCube"));
-	ConstructorHelpers::FObjectFinder<UMaterialInstance> BaseNotHitMat(TEXT("/Game/Puzzle/Meshes/BaseMaterialNotHit.BaseMaterialNotHit"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> BasePlainMesh(TEXT("/Game/Meshes/PuzzleCube.PuzzleCube"));
+	ConstructorHelpers::FObjectFinder<UMaterialInstance> BaseNotHitMat(TEXT("MaterialInstanceConstant'/Game/Materials/BaseMaterialNotHit.BaseMaterialNotHit'"));
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh0"));
 	BaseMesh->SetStaticMesh(BasePlainMesh.Object);
 	BaseMesh->SetMaterial(0, BaseNotHitMat.Object);
@@ -55,6 +54,16 @@ void ABrickBreaker360Base::BeginPlay()
 		BallObject = GetWorld()->SpawnActor<ABrickBreaker360Ball>(BallObjectClass);
 	BallObject->GetActorBounds(false, temp, BallExtent);
 	AttachBallToBase();
+	ABrickBreaker360BlockGrid* grid = Cast<ABrickBreaker360BlockGrid>(UGameplayStatics::GetActorOfClass(GetWorld(), ABrickBreaker360BlockGrid::StaticClass()));
+	if(grid)
+		BallObject->NoOfBlocks = grid->NoOfBlocks;
+
+	
+	if (HUD_UI_Class)
+	{
+		HUD_UI = Cast<UBrickBreaker360HUD_UI_Base>(CreateWidget(GetWorld(), HUD_UI_Class));
+		HUD_UI->AddToViewport();
+	}
 }
 
 void ABrickBreaker360Base::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -63,11 +72,6 @@ void ABrickBreaker360Base::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction("ShootBall", IE_Pressed, this, &ABrickBreaker360Base::ShootBall);
 }
 
-// Called every frame
-void ABrickBreaker360Base::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
 
 
 void ABrickBreaker360Base::MoveBase(float moveRate)
@@ -75,8 +79,10 @@ void ABrickBreaker360Base::MoveBase(float moveRate)
 	if (moveRate != 0)
 	{
 		FVector currentLocation = GetActorLocation();
+		// Rotate Base around the Grid.
 		currentLocation = currentLocation.RotateAngleAxis(moveRate * MovementDirection * MovementSensitivity, FVector(0.f, 0.f, 1.0f));
 		SetActorLocation(currentLocation);
+		// Rotate base looking at the Grid.
 		FRotator toRotate = FRotator(0.f, moveRate * MovementDirection * MovementSensitivity, 0.f);
 		AddActorWorldRotation(toRotate);
 		Rotation = toRotate;
@@ -90,7 +96,7 @@ void ABrickBreaker360Base::MoveBase(float moveRate)
 void ABrickBreaker360Base::ShootBall()
 {
 	if(BallObject->IsAttached)
-		BallObject->StartBall(GetActorForwardVector());
+		BallObject->ShootBall(GetActorForwardVector());
 }
 
 void ABrickBreaker360Base::AttachBallToBase()
@@ -99,5 +105,5 @@ void ABrickBreaker360Base::AttachBallToBase()
 	FVector attachPointRef = FVector::CrossProduct(GetActorForwardVector(), FVector::UpVector) * BallAttachPos;
 	ActorLineTraceSingle(hitRes, GetActorLocation() + attachPointRef, GetActorForwardVector() * 100, ECollisionChannel::ECC_Camera, FCollisionQueryParams());
 	BallObject->SetActorLocation(hitRes.ImpactPoint + GetActorForwardVector() * BallExtent.X * 2);
-	BallObject->SetActorLocation(BallObject->GetActorLocation() + FVector(0.f, 0.f, BallExtent.Z));
+	BallObject->SetActorLocation(FVector(BallObject->GetActorLocation().X, BallObject->GetActorLocation().Y, GetActorLocation().Z));
 }

@@ -21,6 +21,7 @@ ABrickBreaker360BlockGrid::ABrickBreaker360BlockGrid()
 	Radius = 1000;
 	Rows = 5;
 	BlockSpacing = 20.f;
+	NoOfBlocks = 0;
 
 	RotationSpeed = 0.f;
 	CanRotate = false;
@@ -30,7 +31,6 @@ ABrickBreaker360BlockGrid::ABrickBreaker360BlockGrid()
 void ABrickBreaker360BlockGrid::BeginPlay()
 {
 	Super::BeginPlay();
-	//UE_LOG(LogTemp, Warning, TEXT("Radius: %d"), Radius)
 	float rowHeight = 2 * Radius / Rows;
 
 	ABrickBreaker360Block* SampleBlock = GetWorld()->SpawnActor<ABrickBreaker360Block>(BrickBreaker360BlockClass, FVector::ZeroVector, FRotator::ZeroRotator);
@@ -66,7 +66,6 @@ void ABrickBreaker360BlockGrid::BeginPlay()
 			leftPointY += currBlockWidth;
 			rowWidth -= currBlockWidth;
 
-			//UE_LOG(LogTemp, Warning, TEXT("Row Bottom: %f, Row Width: %f,, Radius: %d"), rowMidX, rowWidth, c, Radius)
 			// Make position vector, offset from Grid location
 			FVector BlockLocation = FVector(XOffset, YOffset, 0.f);
 
@@ -74,20 +73,10 @@ void ABrickBreaker360BlockGrid::BeginPlay()
 			ABrickBreaker360Block* NewBlock = GetWorld()->SpawnActor<ABrickBreaker360Block>(BrickBreaker360BlockClass, BlockLocation, FRotator(0, 0, 0));
 			NewBlock->SetActorScale3D(FVector((rowHeight - BlockSpacing) / blockHeight, (currBlockWidth - BlockSpacing) / blockWidth, NewBlock->GetActorScale3D().Z));
 			NewBlock->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
-			NewBlock->SetPowerUpScale();
-			BlockArray.Add(NewBlock);
-			// Tell the block about its owner
-			if (NewBlock != nullptr)
-			{
-				NewBlock->OwningGrid = this;
-			}
+			NewBlock->SetPowerUpScale(((float)Radius / 5) / blockExtent.X);
+			NoOfBlocks++;
 		}
 	}
-}
-
-void ABrickBreaker360BlockGrid::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 #undef LOCTEXT_NAMESPACE

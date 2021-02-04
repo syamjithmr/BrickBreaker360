@@ -8,6 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABrickBreaker360Ball::ABrickBreaker360Ball()
@@ -15,11 +16,7 @@ ABrickBreaker360Ball::ABrickBreaker360Ball()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	// Create dummy root scene component
-	//RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-
 	SphereCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Collider Component"));
-	//SphereCollider->SetupAttachment(RootComponent);
 	RootComponent = SphereCollider;
 	SphereCollider->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 
@@ -30,8 +27,6 @@ ABrickBreaker360Ball::ABrickBreaker360Ball()
 	BallMesh->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 	BallMesh->SetRelativeScale3D(FVector(0.6f, 0.6f, 0.6f));
 
-	ConstructorHelpers::FObjectFinder<UPhysicalMaterial> PhysMatAsset(TEXT("PhysicalMaterial'/Game/BallPhyscalMat.BallPhyscalMat'"));
-	BallPhysMat = PhysMatAsset.Object;
 	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	IsSticky = true;
@@ -45,8 +40,6 @@ void ABrickBreaker360Ball::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OnActorBeginOverlap.AddDynamic(this, &ABrickBreaker360Ball::OnOverlapBegin);
-	OnActorEndOverlap.AddDynamic(this, &ABrickBreaker360Ball::OnOverlapEnd);
 	OnActorHit.AddDynamic(this, &ABrickBreaker360Ball::OnHit);
 }
 
@@ -55,6 +48,7 @@ void ABrickBreaker360Ball::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Keep the ball moving in costant velocity.
 	FVector currVelocity = SphereCollider->GetPhysicsLinearVelocity();
 	if (!IsSticky && !IsAttached && currVelocity.Size() != Velocity)
 	{
@@ -66,7 +60,8 @@ void ABrickBreaker360Ball::Tick(float DeltaTime)
 }
 
 
-void ABrickBreaker360Ball::StartBall(FVector shootDir)
+
+void ABrickBreaker360Ball::ShootBall(FVector shootDir)
 {
 	IsSticky = false;
 	IsAttached = false;
@@ -80,26 +75,13 @@ void ABrickBreaker360Ball::StartBall(FVector shootDir)
 	MoveDir = shootDir;
 }
 
-void ABrickBreaker360Ball::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
-{
-	if (IsSticky && IsAttached) return;
-	
-	//UE_LOG(LogTemp, Warning, TEXT("Entered"))
-}
-
-void ABrickBreaker360Ball::OnOverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
-{
-	if (IsSticky && IsAttached) return;
-
-	//UE_LOG(LogTemp, Warning, TEXT("Left"))
-}
-
 void ABrickBreaker360Ball::OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (IsSticky && IsAttached) return;
 
-	if (OtherActor->GetFName().GetPlainNameString().Contains("base"))
+	if (OtherActor->IsA(ABrickBreaker360Base::StaticClass()))
 	{
+		// If Ball is sticky and hit Base, attach it to the Base.
 		if (IsSticky)
 		{
 			IsAttached = true;
@@ -111,21 +93,39 @@ void ABrickBreaker360Ball::OnHit(AActor* SelfActor, AActor* OtherActor, FVector 
 				base->BallAttachPos = baseToHitPoint.Size();
 			else
 				base->BallAttachPos = -baseToHitPoint.Size();
-			//UE_LOG(LogTemp, Warning, TEXT("Magnitude:%f"), hitPointBasePos.Size())
 			SphereCollider->SetSimulatePhysics(false);
 			SphereCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 	}
 	else
 	{
-		if (APowerUpBase* powerUp = Cast<ABrickBreaker360Block>(OtherActor)->PowerUp)
+		// If the ball hits a Block, spawn PowerUp if one is avilable and destroy the block.
+		if (OtherActor->IsA(ABrickBreaker360Block::StaticClass()))
 		{
-			FVector PowerUpVelocity = Hit.ImpactPoint - GetActorLocation();// *SphereCollider->GetPhysicsLinearVelocity();
-			PowerUpVelocity.Normalize();
-			PowerUpVelocity *= SphereCollider->GetPhysicsLinearVelocity()/2;
-			powerUp->StartPowerUp(PowerUpVelocity);
+			if (APowerUpBase* powerUp = Cast<ABrickBreaker360Block>(OtherActor)->PowerUp)
+			{
+				FVector PowerUpVelocity = SphereCollider->GetPhysicsLinearVelocity();
+				powerUp->StartPowerUp(PowerUpVelocity.GetSafeNormal());
+			}
+			OtherActor->Destroy();
+			// If no blocks are present, win the game.
+			if (--NoOfBlocks < 1)
+				GameWon();
 		}
-		OtherActor->Destroy();
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("Hit %s"), *GetDebugName(OtherActor))
+}
+
+void ABrickBreaker360Ball::PrepareBallToBeAttached()
+{
+	IsSticky = true;
+	IsAttached = true;
+	
+	SphereCollider->SetSimulatePhysics(false);
+	SphereCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ABrickBreaker360Ball::GameWon_Implementation()
+{
+	SphereCollider->SetSimulatePhysics(false);
+	SphereCollider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
