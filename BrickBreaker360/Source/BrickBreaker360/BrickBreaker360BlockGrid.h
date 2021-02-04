@@ -32,12 +32,12 @@ public:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ABrickBreaker360Block> BrickBreaker360BlockClass;
 
+	TArray<class ABrickBreaker360Block*> BlockArray;
+
 protected:
 	// Begin AActor interface
 	virtual void BeginPlay() override;
 	// End AActor interface
-
-	TArray<class ABrickBreaker360Block*> BlockArray;
 
 	float RotationSpeed;
 

@@ -16,17 +16,16 @@ public:
 	ABrickBreaker360Ball();
 
 	UPROPERTY(BlueprintReadWrite)
-	bool IsSticky;
-	bool IsAttached;
+		bool IsSticky;
+	UPROPERTY(BlueprintReadonly)
+		bool IsAttached;
+	UPROPERTY(BlueprintReadWrite)
+		int NoOfBlocks;
 
 	void StartBall(FVector shootDir);
 
 	UFUNCTION()
-	void OnOverlapBegin(class AActor* OverlappedActor, class AActor* OtherActor);
-	UFUNCTION()
-	void OnOverlapEnd(class AActor* OverlappedActor, class AActor* OtherActor);
-	UFUNCTION()
-	void OnHit(class AActor* SelfActor, class AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
+		void OnHit(class AActor* SelfActor, class AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 
 protected:
 	// Called when the game starts or when spawned
@@ -37,12 +36,16 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 		class UStaticMeshComponent* BallMesh;
-
 	UPROPERTY(EditAnywhere)
 		class USphereComponent* SphereCollider;
-	
 	UPROPERTY(EditAnywhere)
 		UPhysicalMaterial* BallPhysMat;
+
+	UFUNCTION(BlueprintCallable)
+		void AttachBallToBase();
+	UFUNCTION(BlueprintNativeEvent)
+		void GameWon();
+	void GameWon_Implementation();
 
 public:	
 	// Called every frame

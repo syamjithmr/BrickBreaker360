@@ -17,14 +17,14 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float TimeRemaining;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		bool HasTimer;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	UFUNCTION()
 		void OnOverlapBegin(class AActor* OverlappedActor, class AActor* OtherActor);
-	UFUNCTION()
-		void UpdatePowerUpTimer();
 
 	UPROPERTY(EditAnywhere)
 		class UStaticMeshComponent* CubeMesh;
@@ -35,8 +35,6 @@ protected:
 		class UMaterialInstanceDynamic* MaterialInstance;
 	UPROPERTY(BlueprintReadWrite)
 		class UUserWidget* PowerUPUISlot;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		bool HasTimer;
 
 public:	
 	// Called every frame
@@ -45,6 +43,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 		void ActivatePowerUp();
 	virtual void ActivatePowerUp_Implementation();
+	UFUNCTION(BlueprintCallable)
+		void UpdatePowerUpTimer();
 	UFUNCTION(BlueprintNativeEvent)
 		void EndPowerUp();
 	virtual void EndPowerUp_Implementation();

@@ -17,7 +17,7 @@ APowerUpBase::APowerUpBase()
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMeshAsset(TEXT("/Game/Puzzle/Meshes/PuzzleCube.PuzzleCube"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMeshAsset(TEXT("/Game/Meshes/PuzzleCube.PuzzleCube"));
 	CubeMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Component"));
 	CubeMesh->SetStaticMesh(CubeMeshAsset.Object);
 	CubeMesh->SetupAttachment(RootComponent);
@@ -94,15 +94,18 @@ void APowerUpBase::ActivatePowerUp_Implementation()
 	{
 		if (activatedPowerUp->HasTimer)
 			activatedPowerUp->TimeRemaining += TimeRemaining;
+		else
+			activatedPowerUp->TimeRemaining++;
 	}
 	else
 	{
 		if (HasTimer)
 			GetWorldTimerManager().SetTimer(PowerUpTimer, this, &APowerUpBase::UpdatePowerUpTimer, 1.f, true);
+		else
+			TimeRemaining = 1.f;
 		gameMode->ActivatedPowerUps.Add(this);
 		HUD_UI->PowerUpActivated(this);
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("Activated Power Ups: %d"), gameMode->ActivatedPowerUps.Num())
 }
 
 void APowerUpBase::UpdatePowerUpTimer()

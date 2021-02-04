@@ -74,7 +74,7 @@ void ABrickBreaker360BlockGrid::BeginPlay()
 			ABrickBreaker360Block* NewBlock = GetWorld()->SpawnActor<ABrickBreaker360Block>(BrickBreaker360BlockClass, BlockLocation, FRotator(0, 0, 0));
 			NewBlock->SetActorScale3D(FVector((rowHeight - BlockSpacing) / blockHeight, (currBlockWidth - BlockSpacing) / blockWidth, NewBlock->GetActorScale3D().Z));
 			NewBlock->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
-			NewBlock->SetPowerUpScale(((float)Radius / 10) / rowHeight);
+			NewBlock->SetPowerUpScale(((float)Radius / 5) / blockExtent.X);
 			BlockArray.Add(NewBlock);
 			// Tell the block about its owner
 			if (NewBlock != nullptr)

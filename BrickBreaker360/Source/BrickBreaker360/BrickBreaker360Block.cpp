@@ -19,7 +19,7 @@ ABrickBreaker360Block::ABrickBreaker360Block()
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> BlueMaterial;
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> OrangeMaterial;
 		FConstructorStatics()
-			: PlaneMesh(TEXT("/Game/Puzzle/Meshes/PuzzleCube.PuzzleCube"))
+			: PlaneMesh(TEXT("/Game/Meshes/PuzzleCube.PuzzleCube"))
 			, BaseMaterial(TEXT("Material'/Game/Materials/BaseMaterial.BaseMaterial'"))
 			, BlueMaterial(TEXT("MaterialInstanceConstant'/Game/Materials/BlueMaterial.BlueMaterial'"))
 			, OrangeMaterial(TEXT("MaterialInstanceConstant'/Game/Materials/OrangeMaterial.OrangeMaterial'"))
@@ -44,6 +44,8 @@ ABrickBreaker360Block::ABrickBreaker360Block()
 	BaseMaterial = ConstructorStatics.BaseMaterial.Get();
 	BlueMaterial = ConstructorStatics.BlueMaterial.Get();
 	OrangeMaterial = ConstructorStatics.OrangeMaterial.Get();
+
+	PowerUpSpawnProbability = 5;
 }
 
 // Called when the game starts or when spawned
@@ -52,14 +54,16 @@ void ABrickBreaker360Block::BeginPlay()
 	Super::BeginPlay();
 
 	PowerUp = nullptr;
+
 	int PowerUpIndex = UKismetMathLibrary::RandomIntegerInRange(-1, PowerUpArray.Num() - 1);
-	if (PowerUpIndex != -1 && PowerUpArray.Num() != 0)
+	if (UKismetMathLibrary::RandomIntegerInRange(0, PowerUpSpawnProbability) == 0 && PowerUpIndex != -1 && PowerUpArray.Num() != 0)
 	{
 		UClass* PowerUpClass = PowerUpArray[PowerUpIndex].Get();
 		PowerUp = GetWorld()->SpawnActor<APowerUpBase>(PowerUpClass);
 		PowerUp->SetActorLocation(FVector(0.f, 0.f, 25.f));
 		PowerUp->SetActorScale3D(BlockMesh->GetRelativeScale3D());
 		PowerUp->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+		BlockMesh->SetMaterial(0, OrangeMaterial);
 	}
 }
 

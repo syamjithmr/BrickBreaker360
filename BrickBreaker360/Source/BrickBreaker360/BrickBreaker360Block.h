@@ -48,7 +48,9 @@ public:
 	UPROPERTY(EditAnywhere)
 		TArray<TSubclassOf<class APowerUpBase>> PowerUpArray;
 	UPROPERTY(VisibleAnywhere)
-	APowerUpBase* PowerUp;
+		APowerUpBase* PowerUp;
+	UPROPERTY(EditAnywhere)
+		int PowerUpSpawnProbability;
 	void SetPowerUpScale();
 	void SetPowerUpScale(float ScaleXY);
 
