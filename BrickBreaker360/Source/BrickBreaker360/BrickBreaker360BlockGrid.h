@@ -18,38 +18,32 @@ class ABrickBreaker360BlockGrid : public AActor
 
 public:
 	ABrickBreaker360BlockGrid();
-	/** Number of rows of grid **/
+	// Number of rows of grid.
 	UPROPERTY(Category=Grid, EditAnywhere, BlueprintReadOnly)
 		int Rows;
-
+	// Radius of the Grid.
 	UPROPERTY(Category = Grid, EditAnywhere, BlueprintReadOnly)
 		int Radius;
-
 	/** Spacing of blocks */
 	UPROPERTY(Category=Grid, EditAnywhere, BlueprintReadOnly)
-	float BlockSpacing;
-
+		float BlockSpacing;
+	// If the Grid can rotate.
+	UPROPERTY(BlueprintReadwrite)
+		bool CanRotate;
+	int NoOfBlocks;
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ABrickBreaker360Block> BrickBreaker360BlockClass;
 
-	TArray<class ABrickBreaker360Block*> BlockArray;
-
 protected:
-	// Begin AActor interface
+	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	// End AActor interface
 
 	float RotationSpeed;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	/** Returns DummyRoot subobject **/
 	FORCEINLINE class USceneComponent* GetDummyRoot() const { return DummyRoot; }
 
-	UPROPERTY(BlueprintReadwrite)
-		bool CanRotate;
 };
 
 

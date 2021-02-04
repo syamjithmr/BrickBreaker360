@@ -15,12 +15,10 @@ ABrickBreaker360Block::ABrickBreaker360Block()
 	struct FConstructorStatics
 	{
 		ConstructorHelpers::FObjectFinderOptional<UStaticMesh> PlaneMesh;
-		ConstructorHelpers::FObjectFinderOptional<UMaterial> BaseMaterial;
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> BlueMaterial;
 		ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> OrangeMaterial;
 		FConstructorStatics()
 			: PlaneMesh(TEXT("/Game/Meshes/PuzzleCube.PuzzleCube"))
-			, BaseMaterial(TEXT("Material'/Game/Materials/BaseMaterial.BaseMaterial'"))
 			, BlueMaterial(TEXT("MaterialInstanceConstant'/Game/Materials/BlueMaterial.BlueMaterial'"))
 			, OrangeMaterial(TEXT("MaterialInstanceConstant'/Game/Materials/OrangeMaterial.OrangeMaterial'"))
 		{
@@ -40,8 +38,7 @@ ABrickBreaker360Block::ABrickBreaker360Block()
 	BlockMesh->SetMaterial(0, ConstructorStatics.BlueMaterial.Get());
 	BlockMesh->SetupAttachment(DummyRoot);
 
-	// Save a pointer to the orange material
-	BaseMaterial = ConstructorStatics.BaseMaterial.Get();
+	// Save a pointer to the blue and orange material
 	BlueMaterial = ConstructorStatics.BlueMaterial.Get();
 	OrangeMaterial = ConstructorStatics.OrangeMaterial.Get();
 
@@ -55,6 +52,7 @@ void ABrickBreaker360Block::BeginPlay()
 
 	PowerUp = nullptr;
 
+	// Attach a Power Up to the Block, if conditions are satisfied.
 	int PowerUpIndex = UKismetMathLibrary::RandomIntegerInRange(-1, PowerUpArray.Num() - 1);
 	if (UKismetMathLibrary::RandomIntegerInRange(0, PowerUpSpawnProbability) == 0 && PowerUpIndex != -1 && PowerUpArray.Num() != 0)
 	{

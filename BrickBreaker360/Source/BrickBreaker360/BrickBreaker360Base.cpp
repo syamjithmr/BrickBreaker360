@@ -15,9 +15,6 @@
 // Sets default values
 ABrickBreaker360Base::ABrickBreaker360Base()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
@@ -59,7 +56,7 @@ void ABrickBreaker360Base::BeginPlay()
 	AttachBallToBase();
 	ABrickBreaker360BlockGrid* grid = Cast<ABrickBreaker360BlockGrid>(UGameplayStatics::GetActorOfClass(GetWorld(), ABrickBreaker360BlockGrid::StaticClass()));
 	if(grid)
-		BallObject->NoOfBlocks = grid->BlockArray.Num();
+		BallObject->NoOfBlocks = grid->NoOfBlocks;
 
 	
 	if (HUD_UI_Class)
@@ -75,11 +72,6 @@ void ABrickBreaker360Base::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction("ShootBall", IE_Pressed, this, &ABrickBreaker360Base::ShootBall);
 }
 
-// Called every frame
-void ABrickBreaker360Base::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
 
 
 void ABrickBreaker360Base::MoveBase(float moveRate)
@@ -87,8 +79,10 @@ void ABrickBreaker360Base::MoveBase(float moveRate)
 	if (moveRate != 0)
 	{
 		FVector currentLocation = GetActorLocation();
+		// Rotate Base around the Grid.
 		currentLocation = currentLocation.RotateAngleAxis(moveRate * MovementDirection * MovementSensitivity, FVector(0.f, 0.f, 1.0f));
 		SetActorLocation(currentLocation);
+		// Rotate base looking at the Grid.
 		FRotator toRotate = FRotator(0.f, moveRate * MovementDirection * MovementSensitivity, 0.f);
 		AddActorWorldRotation(toRotate);
 		Rotation = toRotate;
@@ -102,7 +96,7 @@ void ABrickBreaker360Base::MoveBase(float moveRate)
 void ABrickBreaker360Base::ShootBall()
 {
 	if(BallObject->IsAttached)
-		BallObject->StartBall(GetActorForwardVector());
+		BallObject->ShootBall(GetActorForwardVector());
 }
 
 void ABrickBreaker360Base::AttachBallToBase()

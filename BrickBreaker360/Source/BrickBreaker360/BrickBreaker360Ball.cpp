@@ -48,6 +48,7 @@ void ABrickBreaker360Ball::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Keep the ball moving in costant velocity.
 	FVector currVelocity = SphereCollider->GetPhysicsLinearVelocity();
 	if (!IsSticky && !IsAttached && currVelocity.Size() != Velocity)
 	{
@@ -59,7 +60,8 @@ void ABrickBreaker360Ball::Tick(float DeltaTime)
 }
 
 
-void ABrickBreaker360Ball::StartBall(FVector shootDir)
+
+void ABrickBreaker360Ball::ShootBall(FVector shootDir)
 {
 	IsSticky = false;
 	IsAttached = false;
@@ -79,6 +81,7 @@ void ABrickBreaker360Ball::OnHit(AActor* SelfActor, AActor* OtherActor, FVector 
 
 	if (OtherActor->IsA(ABrickBreaker360Base::StaticClass()))
 	{
+		// If Ball is sticky and hit Base, attach it to the Base.
 		if (IsSticky)
 		{
 			IsAttached = true;
@@ -96,6 +99,7 @@ void ABrickBreaker360Ball::OnHit(AActor* SelfActor, AActor* OtherActor, FVector 
 	}
 	else
 	{
+		// If the ball hits a Block, spawn PowerUp if one is avilable and destroy the block.
 		if (OtherActor->IsA(ABrickBreaker360Block::StaticClass()))
 		{
 			if (APowerUpBase* powerUp = Cast<ABrickBreaker360Block>(OtherActor)->PowerUp)
@@ -104,13 +108,14 @@ void ABrickBreaker360Ball::OnHit(AActor* SelfActor, AActor* OtherActor, FVector 
 				powerUp->StartPowerUp(PowerUpVelocity.GetSafeNormal());
 			}
 			OtherActor->Destroy();
+			// If no blocks are present, win the game.
 			if (--NoOfBlocks < 1)
 				GameWon();
 		}
 	}
 }
 
-void ABrickBreaker360Ball::AttachBallToBase()
+void ABrickBreaker360Ball::PrepareBallToBeAttached()
 {
 	IsSticky = true;
 	IsAttached = true;

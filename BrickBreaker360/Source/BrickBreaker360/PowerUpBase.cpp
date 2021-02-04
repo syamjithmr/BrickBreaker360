@@ -49,8 +49,9 @@ void APowerUpBase::Tick(float DeltaTime)
 
 void APowerUpBase::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if (OtherActor->GetFName().GetPlainNameString().Contains("base"))
+	if (OtherActor->IsA(ABrickBreaker360Base::StaticClass()))
 	{
+		// Activate the power up on interacting with Base.
 		HUD_UI = Cast<ABrickBreaker360Base>(OtherActor)->HUD_UI;
 		ActivatePowerUp();
 	}
@@ -60,8 +61,10 @@ void APowerUpBase::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 
 void APowerUpBase::StartPowerUp(FVector velocity)
 {
+	// Show and add velocity.
 	Velocity = velocity * 500;
 	SetActorHiddenInGame(false);
+	// Enable to collision.
 	SetActorEnableCollision(true);
 	CubeMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
@@ -78,6 +81,7 @@ void APowerUpBase::ScaleXY(float scale)
 
 void APowerUpBase::ActivatePowerUp_Implementation()
 {
+	// Hide and stop the PowerUp, and disable collision.
 	SetActorHiddenInGame(true);
 	CubeMesh->SetGenerateOverlapEvents(false);
 	Velocity = FVector::ZeroVector;
@@ -92,6 +96,7 @@ void APowerUpBase::ActivatePowerUp_Implementation()
 		}
 	if (activatedPowerUp)
 	{
+		// If this PowerUp is already activated, Update TimeRemaining of the existing PowerUp.
 		if (activatedPowerUp->HasTimer)
 			activatedPowerUp->TimeRemaining += TimeRemaining;
 		else
@@ -99,11 +104,13 @@ void APowerUpBase::ActivatePowerUp_Implementation()
 	}
 	else
 	{
+		// If this PowerUp is not activated already, start the PowerUp and add it to the array.
 		if (HasTimer)
 			GetWorldTimerManager().SetTimer(PowerUpTimer, this, &APowerUpBase::UpdatePowerUpTimer, 1.f, true);
 		else
 			TimeRemaining = 1.f;
 		gameMode->ActivatedPowerUps.Add(this);
+		// Update HUD.
 		HUD_UI->PowerUpActivated(this);
 	}
 }
@@ -117,6 +124,7 @@ void APowerUpBase::UpdatePowerUpTimer()
 
 void APowerUpBase::EndPowerUp_Implementation()
 {
+	// Remove the PowerUp from the array.
 	ABrickBreaker360GameMode* gameMode = Cast<ABrickBreaker360GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	for (APowerUpBase* tempPowerUp : gameMode->ActivatedPowerUps)
 		if (this->IsA(tempPowerUp->GetClass()))
@@ -124,8 +132,8 @@ void APowerUpBase::EndPowerUp_Implementation()
 			gameMode->ActivatedPowerUps.Remove(tempPowerUp);
 			break;
 		}
-	//UE_LOG(LogTemp, Warning, TEXT("Activated Power Ups: %d"), gameMode->ActivatedPowerUps.Num())
 	GetWorldTimerManager().ClearTimer(PowerUpTimer);
+	// Update HUD.
 	HUD_UI->PowerUpDeactivated(this);
 	Destroy();
 }

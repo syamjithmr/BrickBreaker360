@@ -15,15 +15,20 @@ public:
 	// Sets default values for this pawn's properties
 	ABrickBreaker360Ball();
 
+	// Ball can attach to Base or not.
 	UPROPERTY(BlueprintReadWrite)
 		bool IsSticky;
+	// Ball is attached to Base or not.
 	UPROPERTY(BlueprintReadonly)
 		bool IsAttached;
+	// Number of blocks currently present in the Grid.
 	UPROPERTY(BlueprintReadWrite)
 		int NoOfBlocks;
 
-	void StartBall(FVector shootDir);
+	// Shoot the ball in the specified direction when shoot input is given.
+	void ShootBall(FVector shootDir);
 
+	// Called when the ball hits something.
 	UFUNCTION()
 		void OnHit(class AActor* SelfActor, class AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
 
@@ -31,6 +36,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Direction and Velocity the Ball is currently moving.
 	FVector MoveDir;
 	float Velocity;
 
@@ -41,8 +47,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 		UPhysicalMaterial* BallPhysMat;
 
+	// Prepare the ball to be attached to the base.
 	UFUNCTION(BlueprintCallable)
-		void AttachBallToBase();
+		void PrepareBallToBeAttached();
+	// Called when the game is won.
 	UFUNCTION(BlueprintNativeEvent)
 		void GameWon();
 	void GameWon_Implementation();

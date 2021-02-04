@@ -4,8 +4,5 @@
 
 ABrickBreaker360PlayerController::ABrickBreaker360PlayerController()
 {
-	//bShowMouseCursor = true;
-	//bEnableClickEvents = false;
-	//bEnableTouchEvents = true;
-	//DefaultMouseCursor = EMouseCursor::Crosshairs;
+	
 }

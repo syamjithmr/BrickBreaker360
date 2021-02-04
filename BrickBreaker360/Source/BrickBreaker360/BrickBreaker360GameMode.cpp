@@ -7,7 +7,7 @@
 
 ABrickBreaker360GameMode::ABrickBreaker360GameMode()
 {
-	// no pawn by default
+	// Base as Default Pawn
 	DefaultPawnClass = ABrickBreaker360Base::StaticClass();
 	// use our own player controller class
 	PlayerControllerClass = ABrickBreaker360PlayerController::StaticClass();
